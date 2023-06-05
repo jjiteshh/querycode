@@ -1,0 +1,296 @@
+openapi: "3.0.0"
+info:
+  version: "1.0.0"
+  title: "QueryCode"
+  description: "GPT4 API for QueryCode"
+servers:
+  - url: "http://localhost:4400"
+paths:
+  /get_classes_and_functions/{module_name}:
+    get:
+      summary: "Get classes and functions names from tree"
+      operationId: "getClassesAndFunctions"
+      parameters:
+        - name: "module_name"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        '200':
+          description: "Names and Tree of classes and their functions in the module. This does not include global source code"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                additionalProperties:
+                  type: "array"
+                  items:
+                    type: "string"
+  /get_class_method_source/{module_name}/{className}/{methodName}:
+    get:
+      summary: "Get the source code of a method in a class"
+      operationId: "getClassMethodSource"
+      parameters:
+        - name: "module_name"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "className"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "methodName"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        '200':
+          description: "The source code of the method  in a class"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  source_code:
+                    type: "string"
+                  start_line_number:
+                    type: "integer"
+                    description: "The line number where the method starts"
+                  end_line_number:
+                    type: "integer"
+                    description: "The line number where the method ends"
+
+  /get_function_source/{module_name}/{functionName}:
+    get:
+      summary: "Get the source code of a function"
+      operationId: "getFunctionSource"
+      parameters:
+        - name: "module_name"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "functionName"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        '200':
+          description: "The source code of the function"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  source_code:
+                    type: "string"
+  /get_global_code/{module_name}:
+    get:
+      summary: "Get the global-level source code in the module"
+      operationId: "getGlobalCode"
+      parameters:
+        - name: "module_name"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        '200':
+          description: "The global-level source code"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  global_code:
+                    type: "string"
+  /getcwd:
+    get:
+      summary: "Get the current working directory"
+      operationId: "getCwd"
+      responses:
+        '200':
+          description: "The current working directory"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  current_directory:
+                    type: "string"
+  /getfiles:
+    get:
+      summary: "Get the files in the current working directory"
+      operationId: "getFiles"
+      responses:
+        '200':
+          description: "The files in the current working directory"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  files:
+                    type: "array"
+                    items:
+                      type: "string"
+
+  /get_file_contents/{filename}:
+    get:
+      summary: Get the contents of a file
+      operationId: "getFileContent"
+      parameters:
+        - in: path
+          name: filename
+          schema:
+            type: string
+          required: true
+          description: The name of the file to get the contents of.
+      responses:
+        '200':
+          description: The contents of the file
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  file_contents:
+                    type: string
+        '404':
+          description: File not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /add_line_to_file/{filename}/{line_number}:
+    post:
+      summary: "Save the code to the start point, always ask the user for permission to save the code"
+      operationId: "saveCode"
+      parameters:
+        - name: "filename"
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "line_number"
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+      requestBody:
+        description: "The content of the line to add"
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                line_content:
+                  type: "string"
+      responses:
+        '200':
+          description: "A message indicating that the line was added successfully"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message:
+                    type: "string"
+  
+  /execute_query:
+    post:
+      summary: "Execute a query on the Python source code database"
+      operationId: "executeQuery"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              required:
+                - query
+              properties:
+                query:
+                  type: "string"
+                n_results:
+                  type: "integer"
+                  default: 2
+      responses:
+        '200':
+          description: "The results of the query"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  type: "object"
+                  additionalProperties:
+                    type: "string"
+  /query_memory:
+    post:
+      summary: "Query Memory for summary"
+      operationId: "queryMemory"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              required:
+                - query
+              properties:
+                query:
+                  type: "string"
+                n_results:
+                  type: "integer"
+                  default: 2
+      responses:
+        '200':
+          description: "The results of the query"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  type: "object"
+                  additionalProperties:
+                    type: "string"
+  /save_summary:
+    post:
+      summary: "Save a summary"
+      operationId: "saveSummary"
+      description: "This endpoint saves a summary to the memory. You can use this to save important memories."
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              properties:
+                id:
+                  type: "string"
+                  description: The unique identifier for the summary.
+                summary:
+                  type: "string"
+                  description: "The summary text."
+                metadata:
+                  type: "string"
+                  description: "Additional metadata for the summary."
+              required:
+                - id
+                - metadata
+      responses:
+        '200':
+          description: "Summary saved successfully."
+        '400':
+          description: "Bad request. The request body is missing or contains invalid data."
+        '500':
+          description: "Internal server error."
