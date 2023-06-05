@@ -1,0 +1,20 @@
+{
+    "schema_version": "v1",
+    "name_for_human": "QueryCode",
+    "name_for_model": "QueryCode",
+    "description_for_human": "Plugin to query python code from your local computer.",
+    "description_for_model": "Plugin for query code from users local computer.",
+    "auth": {
+      "type": "none"
+    },
+    "api": {
+      "type": "openapi",
+      "url": "http://localhost:4400/openapi.yaml",
+      "is_user_authenticated": false 
+    },
+    "logo_url": "http://localhost:4400/logo.png",
+    "contact_email": "legal@example.com",
+    "legal_info_url": "http://example.com/legal"
+  }
+  
+  
